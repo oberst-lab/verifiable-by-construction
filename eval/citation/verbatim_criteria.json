@@ -1,0 +1,93 @@
+{
+  "version": "v4-2026-09-02",
+  "_about": "Frozen matching criteria for the Verbatim Compliance Rate. vccr.py reads only this file. Every tier is categorical: no tier uses a similarity measure, so a quote whose prose differs from its source fails at any distance. Numbers are comparable only within one `version`.",
+  "pass_kinds": [
+    "exact",
+    "normalized",
+    "elided"
+  ],
+  "_pass_kinds_note": "All three are categorical. `exact` alters nothing inside the span; `normalized` changes how characters are written but deletes no word of prose; `elided` admits only an abridgement the quote itself marks with an ellipsis. There is no tier that admits a quote whose PROSE differs from its source, which is the property that makes the rate mean one thing.",
+  "exact": {
+    "strip_wrapping_quotes": "“”‘’\"'",
+    "_note": "Leading and trailing quotation marks, and the whitespace around them, are the only thing removed before the literal substring test. Nothing inside the span is touched, so this tier is a category and not a tolerance."
+  },
+  "normalization": {
+    "nfkc": true,
+    "lowercase": true,
+    "fold": {
+      "‘": "'",
+      "’": "'",
+      "“": "\"",
+      "”": "\"",
+      "‐": "-",
+      "‑": "-",
+      "‒": "-",
+      "–": "-",
+      "—": "-",
+      " ": " "
+    },
+    "strip_footnote_markers": "\\^\\d+",
+    "collapse_whitespace": true,
+    "_note": "Applied to BOTH quote and source before the 'normalized' tier. Folds smart quotes / dashes / nbsp, strips caret footnote markers (^12), collapses whitespace — meaning-preserving fixes for extraction artifacts. The `apparatus` block below runs immediately after and is part of the same tier.",
+    "strip_space_before_punct": ",.;:)]}",
+    "_strip_space_before_punct_why": "Applied LAST, after the apparatus deletions, because it exists to repair them. An apparatus rule replaces what it deletes with a space, so a footnote symbol inside `PREVENT*)` leaves the source reading `prevent )` while the guideline, and the model quoting it, both read `PREVENT)`. Collapsing whitespace does not close that gap because the space is legal there. The quote then fails on a character WE introduced. Symmetric: applied to the quote and the section alike.",
+    "strip_list_bullets": "(?m)^[ \\t]*[-*•][ \\t]+",
+    "_strip_list_bullets_why": "A list bullet emitted by our own extraction. A guideline's bulleted list reaches the corpus as `These include:\\n  - weight loss ,\\n  - a heart-healthy dietary pattern`, and a model reading it writes the prose it plainly is; every word is the guideline's and the quote would otherwise fail on dashes WE inserted. Same argument as `table_pipe` and `cell_quote`. Anchored to the START OF A LINE and applied BEFORE `collapse_whitespace`, which is what makes it safe: `fold` maps en and em dashes onto `-`, so a pattern matching a dash between spaces would delete MINUS OPERATORS from formulas such as `total cholesterol - hdl-c`. A bullet is a position, not a character."
+  },
+  "apparatus": {
+    "_note": "Citation apparatus and table markup, deleted from the quote and the section alike before the 'normalized' comparison. Two families. The first is the guideline's OWN apparatus: reference markers a reader sees as superscripts and no quotation has reason to reproduce. The second is markdown OUR extraction threads through the section text, which no reader of the guideline ever sees and which quotes were being scored against. Because every rule is applied to both sides, none of them can make a quote match prose it does not match: they can only stop apparatus from standing between two identical runs of prose.",
+    "_scope_note": "These patterns cover the notations present in the four guidelines in the corpus, not every notation a guideline could use. `aha_ref_id` fires only in cvd-prevention-2019 (390 times, zero in the other three); `after_punct` fires in blood-pressure-2025 and dyslipidemia-2026 and never in the other two; diabetes-care-2026 writes its references as inline `(163)`, which is deliberately NOT stripped because it deletes text a reader sees. Adding a guideline may require a new pattern, and that is a criteria version bump with its reason recorded here, not a code change. This block is data for exactly that reason.",
+    "rules": {
+      "footnote_symbols": {
+        "pattern": "[†‡§¶*]",
+        "_why": "Footnote and table-note symbols carried out of the PDF. Never prose."
+      },
+      "aha_ref_id": {
+        "pattern": "s\\d+\\.\\d+-\\d+(?:\\s*[-,]\\s*s?\\d+\\.\\d+-\\d+)*",
+        "_why": "AHA/ACC section-scoped reference ids, printed as superscripts (S2.1-27). Extraction glues them to the preceding word ('outcomesS2.1-27'), so the quote's own last word looks altered when it is not."
+      },
+      "after_punct": {
+        "pattern": "(?<![0-9][.,])(?<=[.,])\\d+(?:[-,–]\\d+)*(?=\\s|$)",
+        "_why": "Superscript reference numbers after sentence punctuation ('hypertension.25-27'), which NFKC has already folded into ordinary digits. Three guards keep it off real numbers, each answering a way a clinical figure can sit after punctuation: (1) no whitespace between the punctuation and the digits, so ', 70 mg/dL' is untouched, without which '70 mg/dL' and '80 mg/dL' would normalize identically; (2) the punctuation is not preceded by a digit, so decimals and thousands separators ('1.8', '1,500') are untouched; (3) the punctuation is a period or comma and never a colon, so '95% CI:119-128 mm Hg' is untouched."
+      },
+      "table_pipe": {
+        "pattern": "\\|",
+        "_why": "Markdown table cell separator emitted by our own extraction."
+      },
+      "cell_quote": {
+        "pattern": "\"",
+        "_why": "Our extraction wraps each table cell's text in straight double quotes. A quote reproducing the cell's sentence does not reproduce the wrapper."
+      }
+    }
+  },
+  "elided": {
+    "ellipsis_pattern": "\\s*(?:\\[\\.{3,}\\]|\\.{3,})\\s*",
+    "min_fragment_len": 10,
+    "min_fragments": 2,
+    "_note": "A quote using '...' / '[...]' passes as 'elided' if every fragment of >= min_fragment_len chars appears in the source IN ORDER (>= min_fragments such fragments). The two numbers here are structural floors that stop a quote passing on incidental short matches; they are not a similarity tolerance, and they are the only numeric parameters left in this file.",
+    "_unmarked_note": "An omission the quote does NOT mark fails, at any similarity. The quote then presents a discontinuous span of the guideline as a continuous one, which is the thing this tier exists to make explicit rather than to forgive."
+  },
+  "tiers": {
+    "_order": [
+      "exact",
+      "normalized",
+      "elided",
+      "fail",
+      "unresolved"
+    ],
+    "_descriptions": {
+      "exact": "literal substring of the cited section, after removing quotation marks the model wrapped around the quote",
+      "normalized": "substring after the normalization and apparatus rules above",
+      "elided": "ellipsis fragments all present in order",
+      "fail": "the quote's prose is not in the cited section. FAIL. Not subdivided: any split would rest on a similarity threshold, and this version has none",
+      "unresolved": "the cited section_id could not be resolved from the corpus; reported SEPARATELY from fail so a corpus gap is not blamed on the model as fabrication; FAIL"
+    }
+  },
+  "boundary": {
+    "punctuation": ".,;:!?\"'()[]",
+    "_why": "Punctuation at the edges of the excerpt is not part of the quotation. A quote that reproduces a contiguous run of the section and closes it with a period where the guideline has a comma has excerpted, not altered: the test that finds these is `quote stripped of edge punctuation is a contiguous substring of the section`, so nothing inside the span is skipped. Stripped from the QUOTE only, in a run, at both ends, and only for the characters listed. Deliberately NOT listed: `-` (a trailing hyphen is a broken word, not a punctuation choice) and symbols like `%`, `>=` and `/`, whose removal could make a shorter number match a longer one.",
+    "_hazard": "A quote may close a sentence BEFORE a qualifier: `... is recommended, unless contraindicated.` becomes `... is recommended.` and passes. This rule cannot tell that from the harmless case, where the dropped tail is an additive or explanatory continuation ('and', 'as', 'such as', 'with', 'to') or a parenthesised reference number. What the rule admits is therefore a property of the corpus it runs on, and should be checked on a new one.",
+    "never_strip_ellipsis": true,
+    "_never_strip_ellipsis_why": "An ellipsis is the quote ASSERTING that words are missing, which is content, not a delimiter. Without this guard the rule strips a trailing `...` (a run, since `.` is listed and `str.strip` removes runs) and the quote passes as `normalized`, which bypasses the `elided` tier's deliberate `min_fragments` floor: a single-fragment ellipsis quote is one the elided tier REFUSES. Measured at 5 citations. So the boundary strip is refused whenever what it would remove is an ellipsis marker, which restores this block's own claim that it admits a different closing mark and never a missing word."
+  }
+}

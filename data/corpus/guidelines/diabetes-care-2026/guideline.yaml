@@ -1,0 +1,27 @@
+guideline_id: diabetes-care-2026
+guideline_name: "Standards of Care in Diabetes—2026"
+description: "The 2026 ADA Standards of Care in Diabetes provides comprehensive, evidence-based recommendations for the diagnosis, classification, prevention, and management of diabetes across diverse patient populations, including children, adolescents, older adults, pregnant individuals, and hospitalized patients. Key topics include glycemic goals, diabetes technology (continuous glucose monitoring, insulin delivery systems), pharmacologic treatment, obesity management, and the prevention and management of diabetes-related complications such as cardiovascular disease, chronic kidney disease, retinopathy, neuropathy, and foot care. The guideline also addresses diabetes self-management education, health behaviors, and advocacy considerations. Healthcare professionals can use this guideline to inform decisions regarding diabetes screening, individualized treatment strategies, complication prevention, and care across special populations and clinical settings."
+url: "https://diabetesjournals.org/care/issue/49/Supplement_1"
+
+source:
+  type: html
+  dir: "html/diabetes-care-2026"
+
+extract:
+  # The Silverchair "Save Page As" output appends a "References" h2 with a
+  # backreferences-title class. The html_pipeline already drops the
+  # ref-list block itself; this also marks the heading node as non-RAG so
+  # it doesn't show up in the retrieval index.
+  exclude_titles:
+    - "References"
+  # 0 disables; otherwise drop text_file for sections shorter than this.
+  min_text_length: 0
+
+summarize:
+  # Summarize down to tree level 3 = chapters + their direct "X.Y" sub-topics
+  # (not deeper), regardless of section_type. Gives finer retrieval units.
+  max_level: 3
+
+llm:
+  provider: openai
+  model: null

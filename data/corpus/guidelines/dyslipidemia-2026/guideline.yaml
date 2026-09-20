@@ -1,0 +1,39 @@
+guideline_id: dyslipidemia-2026
+guideline_name: "2026 ACC/AHA Guideline on the Management of Dyslipidemia"
+description: "The 2026 ACC/AHA Guideline on the Management of Dyslipidemia addresses the evaluation, diagnosis, and treatment of high cholesterol, hypertriglyceridemia, and lipoprotein(a) elevation across various patient populations, including children, adults with diabetes, pregnant individuals, and those with chronic kidney disease or severe hypercholesterolemia. Key topics include lipid measurement techniques, lifestyle modifications, pharmacotherapy options, and risk assessment strategies tailored to specific groups. The guideline provides evidence-based recommendations for screening, management of dyslipidemia, and monitoring of lipid-lowering therapies, while also identifying gaps in current evidence and emphasizing the importance of patient-centered care."
+url: "https://www.ahajournals.org/doi/10.1161/CIR.0000000000001423"
+
+source:
+  type: epub
+  file: "epub/dyslipidemia-2026.epub"
+
+extract:
+  # Subtrees marked rag_eligible=false. Anchors any section whose path crosses
+  # one of these ids. `backmatter` covers references, appendices, affiliations.
+  exclude_subtrees:
+    - backmatter
+  # Section_id prefixes additionally marked non-RAG (none needed here since
+  # all bibliography/appendix/affiliations live under `backmatter`).
+  exclude_id_prefixes: []
+  # Exact section_ids to mark non-RAG (structural wrappers only).
+  exclude_ids:
+    - frontmatter
+    - bodymatter
+    - backmatter
+  # Title-based exclusion — boilerplate chapters that aren't clinical content.
+  # Section_ids for these vary across guidelines, so we match by title.
+  exclude_titles:
+    - "Presidents and Staff"
+    - "Peer Review Committee Members"
+    - "ACC/AHA Joint Committee on Clinical Practice Guidelines"
+    - "ACC/AHA Task Force Members"
+  # Drop text_file for sections shorter than this. 0 disables the filter.
+  min_text_length: 0
+
+summarize:
+  # chapters + their direct "X.Y" sub-topics (tree level 3), not deeper.
+  max_level: 3
+
+llm:
+  provider: openai
+  model: null

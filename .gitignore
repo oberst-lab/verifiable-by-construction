@@ -1,0 +1,45 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# The de-identification checker. Kept local and never tracked: it has to spell
+# out every name it looks for, so committing it would put the full list of
+# authors, emails and the institution into the repository it exists to keep
+# clean, inside the one file excluded from its own scan.
+scripts/
+
+# The guideline corpus is copyrighted (AHA / ADA) and is never redistributed.
+# data/corpus/ carries the pipeline and each guideline.yaml; the sources it
+# reads and the tree it writes both stay local. Only guideline.yaml is tracked.
+data/corpus/epub/
+data/corpus/html/
+data/corpus/guidelines/*/*
+!data/corpus/guidelines/*/guideline.yaml
+
+# Tests, and the pytest config that finds them. They guard our own edits to this
+# code and are not part of what is released: someone reusing the harness runs the
+# harness, not our test suite. Run them locally with `uv run --with pytest pytest`.
+tests/
+pytest.ini
+
+# Generated question sets. The released set is on Hugging Face.
+data/questions/out/
+
+# Everything the evaluation produces: answers, per-metric reports, and the judge
+# and extractor caches. Reports are generated the same way the corpus tree and
+# the frontend bundle are, so the repository ships the code that makes them and
+# not the artifacts. The caches also hold guideline prose, which cannot be
+# redistributed at all.
+eval/result/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Outputs
+.DS_Store

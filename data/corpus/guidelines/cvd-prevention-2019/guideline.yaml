@@ -1,0 +1,31 @@
+guideline_id: cvd-prevention-2019
+guideline_name: "2019 ACC/AHA Guideline on the Primary Prevention of Cardiovascular Disease"
+description: "The 2019 ACC/AHA Guideline on the Primary Prevention of Cardiovascular Disease focuses on the prevention of atherosclerotic cardiovascular disease (ASCVD) in adults aged 40-75, emphasizing lifestyle modifications and risk factor management. Key topics include risk assessment strategies (10-year ASCVD risk estimation, coronary artery calcium measurement), dietary recommendations, physical activity, tobacco cessation, and pharmacological interventions like statins and antihypertensives. Addresses special populations including individuals with obesity and older adults."
+url: "https://www.ahajournals.org/doi/10.1161/cir.0000000000000678"
+
+source:
+  type: epub
+  file: "epub/cvd-prevention-2019.epub"
+
+extract:
+  exclude_subtrees:
+    - backmatter
+  exclude_id_prefixes: []
+  exclude_ids:
+    - frontmatter
+    - bodymatter
+    - backmatter
+  exclude_titles:
+    - "Presidents and Staff"
+    - "Peer Review Committee Members"
+    - "ACC/AHA Joint Committee on Clinical Practice Guidelines"
+    - "ACC/AHA Task Force Members"
+  min_text_length: 0
+
+summarize:
+  # chapters + their direct "X.Y" sub-topics (tree level 3), not deeper.
+  max_level: 3
+
+llm:
+  provider: openai
+  model: null

@@ -1,0 +1,22 @@
+# Which guidelines the retrieval system may use.
+#   enabled: include in retrieval
+#   default: pre-selected when no explicit selection is made
+#
+# To add a guideline: create guidelines/<id>/guideline.yaml, run the pipeline
+# from data/corpus/, then add an entry here.
+
+cvd-prevention-2019:
+  enabled: true
+  default: true
+
+blood-pressure-2025:
+  enabled: true
+  default: true
+
+dyslipidemia-2026:
+  enabled: true
+  default: true
+
+diabetes-care-2026:
+  enabled: true
+  default: true

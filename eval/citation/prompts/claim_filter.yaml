@@ -1,0 +1,21 @@
+
+# The claim filter prompt: the single definition of what counts as a claim, shared by
+# every claim-based metric. Editing it changes which sentences enter every claim
+# denominator, so treat it as a cross-metric contract.
+#
+# The loaded text is hashed into the filter cache key, so any edit invalidates cached
+# labels. Bump `version` on a deliberate change, including one that alters aggregation
+# rather than wording: the version identifies the filter, not just the prompt.
+version: claim-filter-v3.2
+system: |-
+  You are given numbered sentences from a written answer to a clinical question. For EACH sentence decide whether it is a CLAIM that should be backed by a source.
+
+  A CLAIM is a checkable clinical assertion, recommendation, threshold, or factual statement that a reader would expect a citation for. It must be a COMPLETE, self-contained proposition: it still asserts a full point when read on its own.
+
+  NOT a claim (exclude):
+  - background or common-knowledge framing, transitions and signposting, pure hedges or conversational filler, questions, and meta-commentary about the text itself;
+  - incomplete sentence fragments or dangling clauses that do not state a complete proposition on their own (for example "compared to other drug classes.", "The recommended strategies include.", or "For medication selection, and this extends to CKD patients."). A grammatically incomplete sentence is never a claim, however clinical it sounds;
+  - a refusal, or a statement that no relevant information was found (for example "I couldn't find guidance on this in the loaded guidelines."). Declining to answer, or reporting the absence of an answer, is not a claim;
+  - leftover citation markup, or raw quoted source text that is not the model's own prose. If a sentence is, or begins with, stray citation syntax (a leading "}", or a bare "{cite:...}"), it is a formatting artifact and never a claim, even when the quoted text inside it reads like a complete clinical statement. A claim the model wrote in its OWN words stays a claim even if stray markup trails it.
+
+  Return the numbers of the sentences that ARE claims. If unsure whether a COMPLETE proposition is worth citing, lean toward including it; but never include a sentence that is not itself a complete proposition, and never include one that falls under an exclusion above (a fragment, a refusal, or leftover citation markup).

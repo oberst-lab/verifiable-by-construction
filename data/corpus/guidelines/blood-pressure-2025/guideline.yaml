@@ -1,0 +1,31 @@
+guideline_id: blood-pressure-2025
+guideline_name: "2025 AHA Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults"
+description: "The 2025 AHA/ACC/AANP/AAPA guideline addresses the prevention, detection, evaluation, and management of high blood pressure in adults, focusing on diverse patient populations. It covers key topics such as hypertension diagnosis, treatment goals, lifestyle modifications, and specific considerations for special populations, including those with diabetes, chronic kidney disease, and pregnant individuals. The guideline also emphasizes the importance of evidence-based practices, risk assessment, and management strategies for resistant hypertension and hypertensive emergencies."
+url: "https://www.ahajournals.org/doi/10.1161/CIR.0000000000001356"
+
+source:
+  type: epub
+  file: "epub/blood-pressure-2025.epub"
+
+extract:
+  exclude_subtrees:
+    - backmatter
+  exclude_id_prefixes: []
+  exclude_ids:
+    - frontmatter
+    - bodymatter
+    - backmatter
+  exclude_titles:
+    - "Presidents and Staff"
+    - "Peer Review Committee Members"
+    - "ACC/AHA Joint Committee on Clinical Practice Guidelines"
+    - "ACC/AHA Task Force Members"
+  min_text_length: 0
+
+summarize:
+  # chapters + their direct "X.Y" sub-topics (tree level 3), not deeper.
+  max_level: 3
+
+llm:
+  provider: openai
+  model: null
